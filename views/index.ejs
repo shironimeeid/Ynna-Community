@@ -2102,6 +2102,16 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+ // Fungsi untuk menambahkan opsi event ke dalam elemen select
+ function addEventOptions(events) {
+        const eventSelect = document.getElementById('event');
+        events.forEach(event => {
+            const option = document.createElement('option');
+            option.text = event['Nama Acara (Link acara klik)'];
+            option.value = event['Nama Acara (Link acara klik)']; // Menggunakan nama acara sebagai nilai opsi
+            eventSelect.appendChild(option);
+        });
+    }
 
 
 function cancelAbsen() {
@@ -2142,20 +2152,35 @@ function cancelAbsen() {
         }
     }
 
+    // Fungsi untuk mendapatkan tanggal hari ini dalam format yang sesuai dengan data
+function getTodayDate() {
+    const today = new Date();
+    return today.toLocaleDateString('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit' });
+}
+
+// Fungsi untuk menampilkan hanya event yang belum lewat
+function filterUpcomingEvents(events) {
+    const today = getTodayDate();
+    return events.filter(event => event['Tanggal'] >= today);
+}
+
     // Panggil fungsi untuk memeriksa dan mereset absensi jika sudah lewat dari tanggal event
     function fetchDataFromAPI() {
-        const url = 'https://sheet.best/api/sheets/07db4fd7-1649-4d61-989c-da6ec069a256';
+    const url = 'https://sheet.best/api/sheets/07db4fd7-1649-4d61-989c-da6ec069a256';
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                const events = data;
-                checkAndResetAbsensi(events); // Periksa dan reset absensi jika sudah lewat dari tanggal event
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const events = data;
+            const upcomingEvents = filterUpcomingEvents(events); // Hanya event yang belum lewat yang akan ditampilkan
+            addEventOptions(upcomingEvents); // Tambahkan opsi event ke dalam formulir
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
+fetchDataFromAPI();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
 </body>
